@@ -8,7 +8,7 @@ const OSchemaDefinition = {
         type: String,
         default: "No Content",
     },
-    timestamp: Date
+    diff: String
 };
 const OSchemaOptions = { timestamps: true };
 

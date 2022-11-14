@@ -23,6 +23,18 @@ class FeedDB {
 			return { success: false, data: `DB Error - ${ e }` };
 		}
 	}
+
+	addItem = async ( item ) => {
+		const { _id, title, content, picture, diff } = item;
+		try {
+			const newItem = new FeedModel({_id, title, content, picture, diff}); 
+			const res = await newItem.save();
+            return true;
+		} catch (e) {
+			console.log(`[Feed-DB] Insert Error: ${ e }`);
+			return { success: false, data: `DB Error - ${ e }` };
+		}
+	}
 }
 
 const feedDBInst = FeedDB.getInst();
@@ -33,6 +45,18 @@ router.get('/getfeed', async (req, res) => {
 		const dbRes = await feedDBInst.searchItems({ searchString });
 		if(dbRes.success) return res.status(200).json(dbRes.data);
 		else return res.status(500).json({error: dbRes.data});
+	} catch (e) {
+		return res.status(500).json({error: e});
+	}
+});
+
+router.post('/addfeed', async (req, res) => {
+	try {
+		const { _id, title, content, picture, diff } = req.body;
+
+		const addResult = await feedDBInst.addItem({_id, title, content, picture, diff});
+		if(addResult) return res.status(200).json({isOK: true});
+		else return res.status(500).json({error: addResult});
 	} catch (e) {
 		return res.status(500).json({error: e});
 	}
