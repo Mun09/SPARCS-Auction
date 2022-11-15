@@ -25,7 +25,7 @@ app.use(cors(corsOptions));
 
 app.use('/feed', feedRouter);
 
-app.use('/static', express.static(path.join(__dirname,'public')));
+app.use('/public', express.static(path.join(__dirname,'public')));
 
 const OMongooseOption = { useNewUrlParser: true, useUnifiedTopology: true };
 mongoose.connect(process.env.MONGO_URI, OMongooseOption).then(

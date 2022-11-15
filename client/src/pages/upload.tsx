@@ -1,5 +1,5 @@
 import axios from "axios";
-import React from "react";
+import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import { SAPIBase } from "../tools/api";
@@ -7,21 +7,32 @@ import { getRandom } from "../tools/getrandom";
 import "./css/upload.css";
 
 const Upload = (props: {}) => {
+    type UploadImage = {file: File};
+
     const [Title, setTitle] = React.useState("");
     const [Content, setContent] = React.useState("");
-    const [Picture, setPicture] = React.useState("");
     const [Time, setTime] = React.useState("0");
+    const [PicturePostData, setPicturePostData] = React.useState<UploadImage | null>(null);
 
     const navigate = useNavigate();
 
     const createNewItemAndsend = () => {
         const asyncFun = async () => {
-            const random_id = getRandom();
-            await axios.post( SAPIBase + '/feed/addFeed', { _id: random_id, title: Title, content: Content, picture: Picture, diff: Time } );
+            const random_id = String(getRandom());
+            const postData = { _id: random_id, title: Title, content: Content, diff: Time };
+            const picData = new FormData();
+            if(PicturePostData) {
+                picData.append("picture", PicturePostData.file);
+                picData.append("_id", random_id);
+            }
+            
+            await axios.post( SAPIBase + '/feed/addFeed', postData);
+            await axios.post( SAPIBase + '/feed/addPicture', picData, {});
+
             setTitle("");
             setContent("");
-            setPicture("");
             setTime("0");
+            setPicturePostData(null);
         }
         asyncFun().catch((e) => window.alert(`Error while running API Call: ${e}`));
     }
@@ -30,6 +41,13 @@ const Upload = (props: {}) => {
         createNewItemAndsend();
         navigate('/');
     }
+
+    const UploadPicture = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const fileList = e.target.files;
+        if(fileList && fileList[0]) {
+            setPicturePostData({ file: fileList[0] });
+        }
+    }
     
     return (
         <div>
@@ -37,8 +55,8 @@ const Upload = (props: {}) => {
             <div className={"item-add"}>
                 Title: <input type={"text"} value={Title} onChange={(e)=>{setTitle(e.target.value)}} /><br/>
                 Content: <textarea value={Content} onChange={(e)=>{setContent(e.target.value)}} /><br/>
-                Picture: <input type={"text"} value={Picture} onChange={(e)=>{setPicture(e.target.value)}} /><br/>
-                Auction Time: <input type={"number"} min="0" max="100" value={Time} onChange={(e)=>{setTime(e.target.value)}} />
+                Picture: <input type={"file"} accept={".jpg, .png, .jpeg"} onChange={UploadPicture} /><br/>
+                Auction Time: <input type={"number"} min="0" max="100" value={Time} onChange={(e)=>{setTime(e.target.value);}} />
                 <div className={"Upload btnFade btnWhite"} onClick={() => createNewItem()}>Upload</div>
             </div>
         </div>

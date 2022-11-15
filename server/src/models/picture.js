@@ -2,17 +2,12 @@ const mongoose = require("mongoose");
 
 const OSchemaDefinition = {
     _id: String,
-    title: String,
-    content: {
-        type: String,
-        default: "No Content",
-    },
-    diff: String
+    picture: String
 };
 const OSchemaOptions = { timestamps: true };
 
 const schema = new mongoose.Schema(OSchemaDefinition, OSchemaOptions);
 
-const FeedModel = mongoose.model("feed", schema);
+const PictureFeedModel = mongoose.model("picture", schema);
 
-module.exports = FeedModel;
+module.exports = PictureFeedModel;
