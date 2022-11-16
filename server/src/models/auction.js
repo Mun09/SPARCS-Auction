@@ -2,19 +2,12 @@ const mongoose = require("mongoose");
 
 const OSchemaDefinition = {
     _id: String,
-    title: String,
-    content: {
-        type: String,
-        default: "No Content",
-    },
-    InitialValue: String,
-    CurrentValue: String,
-    diff: String
+    cost: String,
 };
 const OSchemaOptions = { timestamps: true };
 
 const schema = new mongoose.Schema(OSchemaDefinition, OSchemaOptions);
 
-const FeedModel = mongoose.model("feed", schema);
+const FeedModel = mongoose.model("auction", schema);
 
 module.exports = FeedModel;

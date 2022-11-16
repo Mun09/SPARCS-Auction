@@ -1,10 +1,11 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const mongoose = require('mongoose');
+let express = require('express');
+let cors = require('cors');
+let path = require('path');
+let mongoose = require('mongoose');
 require('dotenv').config();
 
 const feedRouter = require('./routes/feed');
+// const auctionRouter = require('./routes/auction');
 
 const app = express();
 const port = process.env.PORT;
@@ -24,8 +25,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use('/feed', feedRouter);
+// app.use('/auction', auctionRouter);
 
-app.use('/public', express.static(path.join(__dirname,'public')));
+// app.use('/public', express.static(path.join(__dirname,'public')));
+app.use('/public', express.static('public'));
 
 const OMongooseOption = { useNewUrlParser: true, useUnifiedTopology: true };
 mongoose.connect(process.env.MONGO_URI, OMongooseOption).then(

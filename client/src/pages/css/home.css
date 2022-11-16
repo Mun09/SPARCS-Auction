@@ -36,6 +36,10 @@ body {
     cursor: pointer;
 }
 
+.textSearch-button {
+    margin: 0px 0px 0px 10px;
+}
+
 .btnFade.btnBlueGreen:hover {
     background: #21825B;
 }

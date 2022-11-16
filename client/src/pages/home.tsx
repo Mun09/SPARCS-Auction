@@ -6,10 +6,9 @@ import { createSearchParams } from "react-router-dom";
 import { useInterval } from "../tools/interval";
 import Header from "../components/Header";
 import "./css/home.css";
-import {Buffer} from 'buffer';
+import { IAPIPictureResponse, IAPIResponse } from "../tools/type";
 
-interface IAPIResponse {_id: string, title: string, content: string, createdAt: Date, diff: string }
-interface IAPIPictureResponse {_id: string, picture: string}
+
 
 const HomePage = (props: {}) => {
 	const Oneday = 24*60*60;
@@ -25,13 +24,16 @@ const HomePage = (props: {}) => {
 		const asyncFun1 = async () => {
 			var { data } = await axios.get<IAPIResponse[]>(SAPIBase + `/feed/getFeed?search=${SSearchItem}`);
 			setAuctionItems(data);
+			return data;
 		}
-		const asyncFun2 = async () => {
-			const { data } = await axios.get<IAPIPictureResponse[]>(SAPIBase + `/feed/getPicture?search=${SSearchItem}`);
+		const asyncFun2 = async (id="") => {
+			const { data } = await axios.get<IAPIPictureResponse[]>(SAPIBase + `/feed/getPicture?search=${""}`);
 			setAuctionItemPicture(data);
+			return data;
 		}
-		asyncFun1().catch((e) => window.alert(`Erorr while running API Call: ${e}`));
-		asyncFun2().catch((e) => window.alert(`Erorr while running API Call: ${e}`));
+		asyncFun1().then((data)=>{
+			asyncFun2()
+		}).catch((e) => window.alert(`Erorr while running API Call: ${e}`));
 	}, [SSearchItem]);
 
 	useInterval( () => {
@@ -56,14 +58,14 @@ const HomePage = (props: {}) => {
 		if(!imageFile && imageFile == null) {
 			return <img src={"/img/default_book.png"} alt="empty thumbnail"></img>
 		}
-		
-		return <img src={imageFile.picture} cross-origin="anonymous" alt={imageFile._id}/>
+		return <img src={`${imageFile.picture}`} alt={imageFile._id}/>
 	}
 
 	return (
 		<div className="home">
 			<Header/>
 			<div className={"moveToUpload btnFade btnWhite"} onClick={() => navigate('/upload')}>Upload my things!</div>
+			<input type={"text"} className="textSearch-button" onChange={(e)=>{setSSearchItem(e.target.value)}} />
 			{ AuctionItems.map((val, i) => {
 				const DataDate = new Date(val.createdAt);
 				DataDate.setDate(DataDate.getDate() + Number(val.diff));
@@ -75,6 +77,7 @@ const HomePage = (props: {}) => {
 					<div className={"feed-picture"}>{showImage({_id: val._id})}</div>
 					<div className={"feed-title"}>{val.title}</div>
 					<div className={"feed-content"}>Info: {val.content}</div>
+					<div className={"feed-value"}>Value: {val.CurrentValue} won</div>
 					<div className={"feed-lefttime"}>Last Time: {day} days {hour} hours {minute} minutes {second} seconds</div>
 				</div>
 				);

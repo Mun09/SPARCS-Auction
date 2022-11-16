@@ -1,8 +1,8 @@
-let express = require('express'),
-    multer = require('multer'),
-    mongoose = require('mongoose'),
-    uuidv4 = require('uuid/v4'),
-		router = express.Router();
+let express = require('express');
+let multer = require('multer');
+let mongoose = require('mongoose');
+let uuidv4 = require('uuid/v4');
+let router = express.Router();
 
 const FeedModel = require('../models/feed');
 const PictureFeedModel = require('../models/picture');
@@ -12,7 +12,7 @@ const DIR = './public/';
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
 			cb(null, DIR);
-	},
+		},
 	filename: (req, file, cb) => {
 			const fileName = file.originalname.toLowerCase().split(' ').join('-');
 			cb(null, uuidv4() + '-' + fileName)
@@ -42,8 +42,10 @@ class FeedDB {
 	searchItems = async ( item ) => {
 		const { searchString } = item;
 		const countLimit = 10;
+		const findArguments = searchString === "" ? {} : {$or: [ {_id: searchString}, { title: { "$regex": searchString } }, { content: { "$regex": searchString } } ]};
+		
 		try {
-			const res = await FeedModel.find().sort({'createdAt': -1}).limit(countLimit).exec();
+			const res = await FeedModel.find(findArguments).sort({'createdAt': -1}).limit(countLimit).exec();
 			return {success: true, data: res};
 		} catch (e) {
 			console.log(`[Feed-DB] Select Error: ${ e }`);
@@ -54,8 +56,10 @@ class FeedDB {
 	searchPictureItems = async ( item ) => {
 		const { searchString } = item;
 		const countLimit = 10;
+		const findArguments = searchString === "" ? {} : {_id: searchString};
+
 		try {
-			const res = await PictureFeedModel.find().sort({'createdAt': -1}).limit(countLimit).exec();
+			const res = await PictureFeedModel.find(findArguments).sort({'createdAt': -1}).limit(countLimit).exec();
 			return {success: true, picture_data: res};
 		} catch (e) {
 			console.log(`[Feed-DB] Picture Select Error: ${ e }`);
@@ -64,9 +68,9 @@ class FeedDB {
 	}
 
 	addItem = async ( item ) => {
-		const { _id, title, content, diff } = item;
+		const { _id, title, content, diff, InitialValue, CurrentValue } = item;
 		try {
-			const newItem = new FeedModel({_id, title, content, diff});
+			const newItem = new FeedModel({_id, title, content, diff, InitialValue, CurrentValue});
 			const res = await newItem.save();
       return true;
 		} catch (e) {
@@ -76,7 +80,7 @@ class FeedDB {
 	}
 
 	addPictureItem = async ( item ) => {
-		const { _id, picture, url, filename} = item;
+		const { _id, url, filename} = item;
 		try {
 			const newItem = new PictureFeedModel({
 				_id: _id,
@@ -89,8 +93,6 @@ class FeedDB {
 			return { success: false, data: `DB Error - ${ e }` };
 		}
 	}
-
-
 }
 
 const feedDBInst = FeedDB.getInst();
@@ -119,8 +121,8 @@ router.get('/getPicture', async (req, res) => {
 
 router.post('/addFeed', async (req, res) => {
 	try {
-		const { _id, title, content, diff } = req.body;
-		const addResult = await feedDBInst.addItem({_id, title, content, diff});
+		const { _id, title, content, diff, InitialValue, CurrentValue} = req.body;
+		const addResult = await feedDBInst.addItem({_id, title, content, diff, InitialValue, CurrentValue});
 		if(addResult) return res.status(200).json({isOK: true});
 		else return res.status(500).json({error: addResult});
 	} catch (e) {
@@ -132,7 +134,7 @@ router.post('/addPicture', upload.single('picture'), async (req, res, next) => {
 	try {
 		const url = req.protocol + '://' + req.get('host');
 		const { _id, picture } = req.body;
-		const addResult = await feedDBInst.addPictureItem({_id, picture, url, filename: req.file.filename});
+		const addResult = await feedDBInst.addPictureItem({_id, url, filename: req.file.filename});
 		if(addResult) return res.status(200).json({isOK: true});
 		else return res.status(500).json({error: addResult});
 	} catch (e) {
