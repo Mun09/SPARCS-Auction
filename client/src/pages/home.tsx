@@ -7,13 +7,9 @@ import { useInterval } from "../tools/interval";
 import Header from "../components/Header";
 import "./css/home.css";
 import { IAPIPictureResponse, IAPIResponse } from "../tools/type";
-
-
+import { Oneday, Onehour, Onemin } from "../tools/constants";
 
 const HomePage = (props: {}) => {
-	const Oneday = 24*60*60;
-	const Onehour = 60*60;
-	const Onemin = 60;
 	const navigate = useNavigate();
 	const [AuctionItems, setAuctionItems] = React.useState<IAPIResponse[]>([]);
 	const [AuctionItemPicture, setAuctionItemPicture] = React.useState<IAPIPictureResponse[]>([]);

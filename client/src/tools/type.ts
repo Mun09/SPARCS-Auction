@@ -7,5 +7,6 @@ interface IAPIResponse {
 	createdAt: Date, 
 	diff: string }
 interface IAPIPictureResponse {_id: string, picture: string}
+interface UserResponse { name: string }
 
 export type {IAPIResponse, IAPIPictureResponse};
