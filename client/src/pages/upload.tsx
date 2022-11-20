@@ -60,7 +60,7 @@ const Upload = (props: {}) => {
                 Content: <textarea value={Content} onChange={(e)=>{setContent(e.target.value)}} /><br/>
                 Picture: <input type={"file"} accept={".jpg, .png, .jpeg"} onChange={UploadPicture} /><br/>
                 Auction Time: <input type={"number"} min="0" max="100" value={Time} onChange={(e)=>{setTime(e.target.value);}} /><br/>
-                Value: <input type={"number"} min="1000" value={ItemValue} onChange={(e)=>{setItemValue(e.target.value);}} />
+                Value: <input type={"number"} min="1000" step="1000" value={ItemValue} onChange={(e)=>{setItemValue(e.target.value);}} /> won
                 <div className={"Upload btnFade btnWhite"} onClick={() => createNewItem()}>Upload</div>
             </div>
         </div>
