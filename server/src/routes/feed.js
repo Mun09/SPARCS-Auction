@@ -3,6 +3,8 @@ let multer = require('multer');
 let mongoose = require('mongoose');
 let uuidv4 = require('uuid/v4');
 let router = express.Router();
+let fs = require('fs');
+let path = require('path');
 
 const FeedModel = require('../models/feed');
 const PictureFeedModel = require('../models/picture');
@@ -18,6 +20,7 @@ const storage = multer.diskStorage({
 			cb(null, uuidv4() + '-' + fileName)
 	}
 });
+
 var upload = multer({
 	storage: storage,
 	fileFilter: (req, file, cb) => {
@@ -93,6 +96,27 @@ class FeedDB {
 			return { success: false, data: `DB Error - ${ e }` };
 		}
 	}
+
+	deleteItem = async ( item ) => {
+		const { id } = item;
+		try {
+			const res = await PictureFeedModel.findOneAndDelete({_id: id}).then((
+				async (r) => {
+					const basename = path.basename(r.picture);
+					fs.unlink('public/' + basename, (err) => {
+						if(err) throw err;
+						console.log('file deleted');
+					})
+					console.log(r);
+					await FeedModel.deleteOne({_id: id})
+				}
+			));
+			return true;
+		} catch (e) {
+			console.log(`[Feed-DB] Delete Error: ${ e }`);
+			return { success: false, data: `DB Error - ${ e }`};
+		}
+	}
 }
 
 const feedDBInst = FeedDB.getInst();
@@ -141,5 +165,16 @@ router.post('/addPicture', upload.single('picture'), async (req, res, next) => {
 		return res.status(500).json({error: e});
 	}
 });
+
+router.post('/deleteItem', async (req, res) => {
+	try {
+		const { id } = req.body;
+		const deleteResult = await feedDBInst.deleteItem({id});
+		if(deleteResult) return res.status(200).json({isOK: true});
+		else return res.status(500).json({error: addResult});
+	} catch (e) {
+		return res.status(500).json({error: e});
+	}
+})
 
 module.exports = router;

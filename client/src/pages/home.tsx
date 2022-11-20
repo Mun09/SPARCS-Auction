@@ -19,6 +19,7 @@ const HomePage = (props: {}) => {
 	const [AuctionItemPicture, setAuctionItemPicture] = React.useState<IAPIPictureResponse[]>([]);
 	const [SSearchItem, setSSearchItem] = React.useState<string>("");
 	const [CurrentTime, setCurrentTime] = React.useState<Date>(new Date());
+	const [Reloading, setReloading] = React.useState(false);
 
 	React.useEffect( () => {
 		const asyncFun1 = async () => {
@@ -34,7 +35,7 @@ const HomePage = (props: {}) => {
 		asyncFun1().then((data)=>{
 			asyncFun2()
 		}).catch((e) => window.alert(`Erorr while running API Call: ${e}`));
-	}, [SSearchItem]);
+	}, [SSearchItem, Reloading]);
 
 	useInterval( () => {
 		setCurrentTime(new Date());
@@ -61,6 +62,15 @@ const HomePage = (props: {}) => {
 		return <img src={`${imageFile.picture}`} alt={imageFile._id}/>
 	}
 
+	const deleteItem = ( item: any ) => {
+		const { _id } = item;
+		const asyncFun = async () => {
+			const { data } = await axios.post(SAPIBase + '/feed/deleteItem', {id: _id});
+			return data;
+		}
+		asyncFun().then((r)=>setReloading(!Reloading)).catch((e)=>{console.log(`Delete Error: ${e}`)});
+	}
+
 	return (
 		<div className="home">
 			<Header/>
@@ -70,12 +80,15 @@ const HomePage = (props: {}) => {
 				const DataDate = new Date(val.createdAt);
 				DataDate.setDate(DataDate.getDate() + Number(val.diff));
 				const diff = (DataDate.getTime()- CurrentTime.getTime()) / 1000;
-				if(diff <= 0) return null;
+				if(diff <= 0) {
+					deleteItem({_id: val._id});
+					return null;
+				}
 				const [day, hour, minute, second] = [Math.floor(diff / Oneday), Math.floor(diff % Oneday / Onehour), Math.floor(diff % Onehour / Onemin), Math.floor(diff % Onemin)];
 				return (
 				<div key={i} className={"feed-item btnFade btnWhite"} onClick={() => goToGoods(val._id)}>
 					<div className={"feed-picture"}>{showImage({_id: val._id})}</div>
-					<div className={"feed-title"}>{val.title}</div>
+					<div className={"feed-title"}>Name: {val.title}</div>
 					<div className={"feed-content"}>Info: {val.content}</div>
 					<div className={"feed-value"}>Value: {val.CurrentValue} won</div>
 					<div className={"feed-lefttime"}>Last Time: {day} days {hour} hours {minute} minutes {second} seconds</div>

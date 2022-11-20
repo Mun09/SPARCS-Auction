@@ -9,6 +9,11 @@ body {
     overflow-y: scroll;
 }
 
+img {
+    width: 500px;
+    height: 250px;
+}
+
 .feed-item {
     border: 2px solid black;
     margin: 10px;

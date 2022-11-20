@@ -5,7 +5,7 @@ let mongoose = require('mongoose');
 require('dotenv').config();
 
 const feedRouter = require('./routes/feed');
-// const auctionRouter = require('./routes/auction');
+const auctionRouter = require('./routes/auction');
 
 const app = express();
 const port = process.env.PORT;
@@ -25,7 +25,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use('/feed', feedRouter);
-// app.use('/auction', auctionRouter);
+app.use('/auction', auctionRouter);
 
 // app.use('/public', express.static(path.join(__dirname,'public')));
 app.use('/public', express.static('public'));
