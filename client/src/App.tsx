@@ -4,7 +4,9 @@ import './App.css';
 import PageNotFound from './pages/404';
 import Goods from './pages/goods';
 import HomePage from './pages/home';
+import LoginPage from './pages/login';
 import MyPage from './pages/mypage';
+import RegisterPage from './pages/register';
 import Upload from './pages/upload';
 
 const App = () => {
@@ -16,6 +18,8 @@ const App = () => {
           <Route path='/goods' element={ <Goods/> }/>
           <Route path='/upload' element={ <Upload/>} />
           <Route path='/mypage' element={ <MyPage/>} />
+          <Route path='/login' element={ <LoginPage/>} />
+          <Route path='/register' element={ <RegisterPage/>} />
           <Route path='*' element={ <PageNotFound/> }/>
         </Routes>
       </BrowserRouter>

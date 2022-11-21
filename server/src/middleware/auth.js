@@ -1,5 +1,8 @@
-const authMiddleware = (req, res, next) => {
-    if (req.body.credential === process.env.API_KEY) {
+const UserModel = require('../models/auctionuser');
+
+const authUserMiddleware = async (req, res, next) => {
+    const { username, password } = req.body;
+    if (isUser({username, password})) {
         console.log("[AUTH-MIDDLEWARE] Authorized User");
         next();
     }
@@ -9,4 +12,15 @@ const authMiddleware = (req, res, next) => {
     }
 }
 
-module.exports = authMiddleware;
+const isUser = async ( item ) => {
+    const { username, password } = item;
+    const object = await UserModel.findOne({
+        where: {
+            name: username,
+            password: password
+        }
+    });
+    return object != null;
+}
+
+module.exports = authUserMiddleware;

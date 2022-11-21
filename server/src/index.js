@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const feedRouter = require('./routes/feed');
 const auctionRouter = require('./routes/auction');
+const userRouter = require('./routes/auctionuser');
 
 const app = express();
 const port = process.env.PORT;
@@ -26,6 +27,7 @@ app.use(cors(corsOptions));
 
 app.use('/feed', feedRouter);
 app.use('/auction', auctionRouter);
+app.use('/user', userRouter);
 
 // app.use('/public', express.static(path.join(__dirname,'public')));
 app.use('/public', express.static('public'));
