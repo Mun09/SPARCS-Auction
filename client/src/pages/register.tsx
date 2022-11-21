@@ -12,7 +12,7 @@ const RegisterPage = () => {
         <div>
             This is RegisterPage
         </div>
-    )
+    );
 }
 
 export default RegisterPage;

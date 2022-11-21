@@ -1,5 +1,6 @@
 import axios from "axios";
 import React from "react";
+import "./css/login.css";
 
 const LoginPage = () => {
     const [UserName, setUserName] = React.useState("");
@@ -24,9 +25,9 @@ const LoginPage = () => {
 
     return (
         <div>
-            <input type={"text"} value={UserName} onChange={(e)=>{setUserName(e.target.value)}}/>
-            <input type={"text"} value={Password} onChange={(e)=>{setPassword(e.target.value)}}/>
-            <div onClick={LoginClick}>Login</div>
+            Your Name : <input type={"text"} value={UserName} onChange={(e)=>{setUserName(e.target.value)}}/><br/>
+            Your Password : <input type={"text"} value={Password} onChange={(e)=>{setPassword(e.target.value)}}/>
+            <div className={"LoginButton"} onClick={LoginClick}>Login</div>
         </div>
     )
 }

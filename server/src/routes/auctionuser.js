@@ -42,7 +42,7 @@ router.post('/getUserIdToken', (req, res) => {
         const UserInfo = userDBInst.getUserInfo({username, password});
         if(UserInfo.success) {
             const data = {data: UserInfo.data};
-            const id = data._id;
+            const id = data.name;
             const token = jwt.encode(data, secret_key);
             return res.status(200).json({success: true, id: id, token: token.data }); 
         } else {
@@ -66,6 +66,20 @@ router.post('/getUserInfo', (req, res) => {
 });
 
 router.post('/getUserInfobyIdToken', (req, res) => {
+    try {
+        const { id, token } = req.query;
+        if(id == "null" || token == "null") {
+            return res.status(200).json({success: false});
+        }
+        const password = jwt.decode(token, secret_key);
+        const UserInfo = userDBInst.getUserInfo({id, password});
+        if(UserInfo.success) {
+            const data = {data: UserInfo.data};
+            return res.status(200).json({success: true, data: UserInfo.data }); 
+        } else {
+            return res.status(200).json({success: false});
+        }
+    } catch (e) { return res.status(500).json({Error: e}) };
 
 });
 
