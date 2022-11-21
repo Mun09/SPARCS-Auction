@@ -14,13 +14,16 @@ const Goods = (props: {}) => {
 	const [PictureItem, setPictureItem] = React.useState<IAPIPictureResponse>();
 	const [AuctionMoney, setAuctionMoney] = React.useState("");
 	const [CurrentCostState, setCurrentCostState] = React.useState<string | undefined>("");
+	const [ValueDiff, setValueDiff] = React.useState("");
 
 	React.useEffect( () => {
 		const asyncFun1 = async () => {
 			const { data } = await axios.get<IAPIResponse[]>(SAPIBase + `/feed/getFeed?search=${id}`);
-			if(data){
+			if(data) {
 				setAuctionItem(data[0]);
 				setCurrentCostState(AuctionItem?.CurrentValue);
+				const diff = Number(AuctionItem?.CurrentValue) - Number(AuctionItem?.InitialValue);
+				setValueDiff(String(diff));
 			}
 		}
 		const asyncFun2 = async () => {
@@ -58,7 +61,8 @@ const Goods = (props: {}) => {
 			<hr className="oneline"></hr>
 			<div className="Item-content">Info: {AuctionItem.content}</div>
 			<hr className="oneline"></hr>
-			<div className="Item-currentvalue">Current Cost: {CurrentCostState}</div>
+			<div className="Item-currentvalue">Current Cost: {CurrentCostState} 
+			<span style={{color: ValueDiff < "0" ? "blue" : "red"}}> ({ValueDiff < "0" ? "-" : "+"}{ValueDiff})</span></div>
 			<hr className="oneline"></hr>
 			<input type="number" value={AuctionMoney} min="1000" step="1000" className="Auction-button" onChange={(e)=>{setAuctionMoney(e.target.value)}}/>
 			<div className="Auction-button" onClick={ClickAuction}>Wanna Auction?</div>
