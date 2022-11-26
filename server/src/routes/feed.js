@@ -5,6 +5,7 @@ let uuidv4 = require('uuid/v4');
 let router = express.Router();
 let fs = require('fs');
 let path = require('path');
+let authUserMiddleware = require('../middleware/auth.js');
 
 const FeedModel = require('../models/feed');
 const PictureFeedModel = require('../models/picture');
@@ -143,7 +144,7 @@ router.get('/getPicture', async (req, res) => {
 	}
 });
 
-router.post('/addFeed', async (req, res) => {
+router.post('/addFeed', authUserMiddleware, async (req, res) => {
 	try {
 		const { _id, title, content, diff, InitialValue, CurrentValue} = req.body;
 		const addResult = await feedDBInst.addItem({_id, title, content, diff, InitialValue, CurrentValue});

@@ -20,16 +20,17 @@ const Upload = (props: {}) => {
     const createNewItemAndsend = () => {
         const asyncFun = async () => {
             const random_id = String(getRandom());
-            const postData = { _id: random_id, title: Title, content: Content, diff: Time, InitialValue: ItemValue, CurrentValue: ItemValue };
+            const id = localStorage.getItem("id");
+            const token = localStorage.getItem("token");
+            const postData = { _id: random_id, title: Title, content: Content, diff: Time, InitialValue: ItemValue, CurrentValue: ItemValue, id, token };
             const picData = new FormData();
             if(PicturePostData) {
                 picData.append("picture", PicturePostData.file);
                 picData.append("_id", random_id);
             }
             
-            await axios.post( SAPIBase + '/feed/addPicture', picData, {}).then(
-                async () => {await axios.post( SAPIBase + '/feed/addFeed', postData);}
-            );
+            await axios.post( SAPIBase + '/feed/addFeed', postData);
+            await axios.post( SAPIBase + '/feed/addPicture', picData, {});
             
             setTitle("");
             setContent("");

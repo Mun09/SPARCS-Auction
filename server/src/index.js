@@ -2,6 +2,8 @@ let express = require('express');
 let cors = require('cors');
 let path = require('path');
 let mongoose = require('mongoose');
+let authUserMiddleware = require('./middleware/auth.js');
+
 require('dotenv').config();
 
 const feedRouter = require('./routes/feed');

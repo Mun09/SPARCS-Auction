@@ -1,3 +1,3 @@
-.LoginButton {
+.LoginButton, .GotoRegisterButton{
     cursor: pointer;
 }

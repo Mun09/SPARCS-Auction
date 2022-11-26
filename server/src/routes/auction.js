@@ -1,5 +1,6 @@
 let express = require('express');
 let router = express.Router();
+let authUserMiddleware = require('../middleware/auth.js');
 
 const AuctionModel = require('../models/feed');
 
@@ -32,7 +33,7 @@ class AuctionDB {
 }
 const auctionDBInst = AuctionDB.getInst();
 
-router.post('/postAuction', async (req, res) => {
+router.post('/postAuction', authUserMiddleware, async (req, res) => {
 	try {
 		const {id, money} = req.query;
 		const result = await auctionDBInst.postMoney({id, money});

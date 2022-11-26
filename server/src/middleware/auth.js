@@ -1,8 +1,10 @@
 const UserModel = require('../models/auctionuser');
+let jwt = require('jwt-simple');
 
 const authUserMiddleware = async (req, res, next) => {
-    const { username, password } = req.body;
-    if (isUser({username, password})) {
+    const { id, token } = req.body;
+    console.log(id, token);
+    if (await isUser({ id, token })) {
         console.log("[AUTH-MIDDLEWARE] Authorized User");
         next();
     }
@@ -13,14 +15,21 @@ const authUserMiddleware = async (req, res, next) => {
 }
 
 const isUser = async ( item ) => {
-    const { username, password } = item;
-    const object = await UserModel.findOne({
-        where: {
-            name: username,
-            password: password
-        }
-    });
-    return object != null;
+    try {
+        let { id, token } = item;
+        let secret_key = process.env.SECRET_KEY;
+
+        if(id == null || token == null) {
+            return false;
+        }    
+        const password = jwt.decode(token, secret_key);
+        const object = await UserModel.findOne(
+            {username: id, password}
+        );
+        return object != null;        
+    } catch (e) {
+        return false;
+    }
 }
 
 module.exports = authUserMiddleware;
