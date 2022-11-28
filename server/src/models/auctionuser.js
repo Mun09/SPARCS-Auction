@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 const OSchemaDefinition = {
     _id: String,
     name: String,
-    password: String
+    password: String,
+    buylist: [String],
+    selllist: [String]
 };
 const OSchemaOptions = { timestamps: true };
 

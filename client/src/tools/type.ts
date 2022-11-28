@@ -7,6 +7,12 @@ interface IAPIResponse {
 	createdAt: Date, 
 	diff: string }
 interface IAPIPictureResponse {_id: string, picture: string}
-interface UserResponse { name: string }
+interface UserResponse {
+    _id: String,
+    name: String,
+    password: String,
+    buylist: [String],
+    selllist: [String]
+}
 
-export type {IAPIResponse, IAPIPictureResponse};
+export type {IAPIResponse, IAPIPictureResponse, UserResponse};

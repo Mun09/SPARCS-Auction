@@ -103,13 +103,13 @@ class FeedDB {
 		try {
 			const res = await PictureFeedModel.findOneAndDelete({_id: id}).then((
 				async (r) => {
+					await FeedModel.deleteOne({_id: id});
 					const basename = path.basename(r.picture);
 					fs.unlink('public/' + basename, (err) => {
 						if(err) throw err;
 						console.log('file deleted');
 					})
 					console.log(r);
-					await FeedModel.deleteOne({_id: id})
 				}
 			));
 			return true;

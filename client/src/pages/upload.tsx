@@ -29,6 +29,9 @@ const Upload = (props: {}) => {
                 picData.append("_id", random_id);
             }
             
+            await axios.post( SAPIBase + '/user/addSelllist', { _id : random_id, id, token });
+            
+            console.log("test");
             await axios.post( SAPIBase + '/feed/addFeed', postData);
             await axios.post( SAPIBase + '/feed/addPicture', picData, {});
             
@@ -38,7 +41,15 @@ const Upload = (props: {}) => {
             setPicturePostData(null);
             setItemValue("1000");
         }
-        asyncFun().catch((e) => window.alert(`Error while running API Call: ${e}`));
+        asyncFun().catch(
+            (e) => {
+                if(e.response && e.response.status == 401) {
+                    window.alert(`Login first`);
+                } else {
+                    window.alert(`Error while running API Call: ${e}`);
+                }
+            }
+        );
     }
 
     const createNewItem = () => {

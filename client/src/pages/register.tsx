@@ -7,28 +7,23 @@ import { SAPIBase } from "../tools/api";
 const RegisterPage = () => {
     const [UserName, setUserName] = React.useState("");
     const [Password, setPassword] = React.useState("");
-    const [RegisterResult, setRegiseterReulst] = React.useState(false);
+    const [RegisterResult, setRegiseterResult] = React.useState(false);
     const navigate = useNavigate();
 
-    const postRegisterInformation = () => {
+    const RegisterHandler = () => {
         const asyncFun = async () => {
-            const { data } = await axios.post(SAPIBase + `/user/register?username=${UserName}&password=${Password}`);
-            setRegiseterReulst(data.success);
+            const { data } = await axios.post(SAPIBase + `/user/register` , {username: UserName, password: Password});
+            setRegiseterResult(data.success);
+            if(RegisterResult == true) {
+                window.alert("Register Success! Login again!");
+                navigate('/');
+            } else {
+                window.alert("Register Fail! Use another name!");
+            }
         }
         asyncFun().catch((e)=>{
             window.alert(`Error: ${e}`)
         });
-    }
-
-    const RegisterHandler = () => {
-        postRegisterInformation();
-        if(RegisterResult) {
-            window.alert("Register Success! Login again!");
-            navigate('/');
-        } else {
-            window.alert("Register Fail! Use another name!");
-        }
-
     }
 
     return (

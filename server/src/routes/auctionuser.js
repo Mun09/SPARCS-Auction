@@ -5,6 +5,7 @@ let getRandomInt = require('../tools/getRandom.js');
 let secret_key = process.env.SECRET_KEY;
 
 const UserModel = require('../models/auctionuser');
+const authUserMiddleware = require('../middleware/auth.js');
 
 class UserDB {
     static _inst_;
@@ -20,6 +21,9 @@ class UserDB {
             const { username, password } = item;
             const findArguments = password != null ? {name: username, password} : {name: username};
             const data = await UserModel.findOne(findArguments);
+            if(data == null) {
+                return {success: false}
+            }
             return {success: true, data: data};
         } catch (e) {
             return {success: false, data: e};
@@ -35,6 +39,17 @@ class UserDB {
             return {success: true};
         } catch (e) {
 			console.log(`[AuctionUser-DB] Register Error: ${ e }`);
+			return { success: false, data: `DB Error - ${ e }` };
+        }
+    }
+
+    addUserSelllist = async ( item ) => {
+        try {
+            const { username, password, sellid } = item;
+            await UserModel.updateOne({ name : username, password }, { $push : { selllist : sellid} });
+            return {success : true};
+        } catch (e) {
+			console.log(`[AuctionUser-DB] Selllist Error: ${ e }`);
 			return { success: false, data: `DB Error - ${ e }` };
         }
     }
@@ -78,7 +93,6 @@ router.post('/getUserInfobyIdToken', async (req, res) => {
         }
         const password = jwt.decode(token, secret_key);
 
-        console.log(id, "and", password);
         const UserInfo = await userDBInst.getUserInfo({username: id, password});
         if(UserInfo.success) {
             return res.status(200).json({success: true, data: UserInfo.data }); 
@@ -90,13 +104,26 @@ router.post('/getUserInfobyIdToken', async (req, res) => {
 
 router.post('/register', async (req, res) => {
     try {
-        const {username, password} = req.query;
-        const isThere = await userDBInst.getUserInfo({username, password});
+        const {username, password} = req.body;
+        const isThere = await userDBInst.getUserInfo({username});
         if(isThere.success==true) {
             return res.status(200).json({success: false});
         }
-        const res = userDBInst.registerUserInfo({username, password});
-        return res;
+        const result = await userDBInst.registerUserInfo({username, password});
+        return res.status(200).json({success: true});
+    } catch (e) {
+        return res.status(500).json({error: e});
+    }
+})
+
+router.post('/addSelllist', authUserMiddleware, async (req, res) => {
+    try {
+        const {_id, id, token} = req.body;
+        const password = jwt.decode(token, secret_key);
+        const UserInfo = await userDBInst.getUserInfo({username: id, password});
+        console.log(UserInfo);
+        const result = await userDBInst.addUserSelllist({username: UserInfo.data.name, password: UserInfo.data.password, sellid : _id});
+        return res.status(200).json({isOK: true});;
     } catch (e) {
         return res.status(500).json({error: e});
     }

@@ -3,10 +3,11 @@ import React from "react";
 import { useNavigate } from "react-router";
 import Header from "../components/Header";
 import { SAPIBase } from "../tools/api";
+import { UserResponse } from "../tools/type";
 import "./css/mypage.css";
 
 const MyPage = () => {
-    const [UserData, setUserData] = React.useState({name: ""});
+    const [UserData, setUserData] = React.useState<UserResponse>();
 	const navigate = useNavigate();
     
     React.useEffect(()=>{
@@ -32,12 +33,28 @@ const MyPage = () => {
         navigate('/');
     }
 
+    if(UserData == null) {
+        return <div>...Loading</div>
+    }
+
     return (
         <div>
             <Header/>
             Your Auction Information<br/>
             Id : {UserData.name}<br/>
-            Your Auction Lists: <br/>
+            Your Buy List: 
+            {UserData.buylist.map((val, i) => {
+                return <div key={i}>
+                    {val}
+                </div>
+            })}
+            <br/>
+            Your Sell List:
+            {UserData.selllist.map((val, i) => {
+                return <div key={i}>
+                    {val}
+                </div>
+            })}
 
             <div style={{height: "300px"}}></div>
             <div className="Logout-button" onClick={Logout}>Logout</div>
