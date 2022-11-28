@@ -53,6 +53,17 @@ class UserDB {
 			return { success: false, data: `DB Error - ${ e }` };
         }
     }
+
+    addUserBuylist = async ( item ) => {
+        try {
+            const { username, password, buyid } = item;
+            await UserModel.updateOne({ name : username, password }, { $push : { buylist : buyid} });
+            return {success : true};
+        } catch (e) {
+			console.log(`[AuctionUser-DB] Selllist Error: ${ e }`);
+			return { success: false, data: `DB Error - ${ e }` };
+        }
+    }
 }
 
 const userDBInst = UserDB.getInst();
@@ -123,6 +134,19 @@ router.post('/addSelllist', authUserMiddleware, async (req, res) => {
         const UserInfo = await userDBInst.getUserInfo({username: id, password});
         console.log(UserInfo);
         const result = await userDBInst.addUserSelllist({username: UserInfo.data.name, password: UserInfo.data.password, sellid : _id});
+        return res.status(200).json({isOK: true});;
+    } catch (e) {
+        return res.status(500).json({error: e});
+    }
+})
+
+router.post('/addBuylist', authUserMiddleware, async (req, res) => {
+    try {
+        const {_id, id, token} = req.body;
+        const password = jwt.decode(token, secret_key);
+        const UserInfo = await userDBInst.getUserInfo({username : id, password});
+        console.log(UserInfo);
+        const result = await userDBInst.addUserBuylist({username: UserInfo.data.name, password: UserInfo.data.password, buyid : _id});
         return res.status(200).json({isOK: true});;
     } catch (e) {
         return res.status(500).json({error: e});

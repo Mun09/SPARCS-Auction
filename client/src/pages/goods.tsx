@@ -10,6 +10,9 @@ const Goods = (props: {}) => {
 	const [ searchParams ] = useSearchParams();
 	const id = searchParams.get('id');
 
+	const token = localStorage.getItem('token');
+	const username = localStorage.getItem('id');
+
 	const [AuctionItem, setAuctionItem] = React.useState<IAPIResponse>();
 	const [PictureItem, setPictureItem] = React.useState<IAPIPictureResponse>();
 	const [AuctionMoney, setAuctionMoney] = React.useState("");
@@ -37,10 +40,11 @@ const Goods = (props: {}) => {
 
 	const ClickAuction = () => {
 		const asyncFun = async () => {
-			const { data } = await axios.post(SAPIBase + `/auction/postAuction?money=${AuctionMoney}&id=${id}`);
+			const { data } = await axios.post(SAPIBase + `/auction/postAuction?money=${AuctionMoney}&id=${id}`, {id : username, token: token});
 			if(data.success) {
 				window.alert(`You Got It!`);
 				setCurrentCostState(data.data.CurrentValue);
+				await axios.post(SAPIBase + '/user/addBuylist', {_id : id, id : username, token : token});
 				console.log(data.data);
 			}
 			else window.alert(`You Missed It!`);
