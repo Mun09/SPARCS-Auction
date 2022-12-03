@@ -45,7 +45,6 @@ const Goods = (props: {}) => {
 				window.alert(`You Got It!`);
 				setCurrentCostState(data.data.CurrentValue);
 				await axios.post(SAPIBase + '/user/addBuylist', {_id : id, id : username, token : token});
-				console.log(data.data);
 			}
 			else window.alert(`You Missed It!`);
 		}

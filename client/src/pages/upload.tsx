@@ -29,12 +29,11 @@ const Upload = (props: {}) => {
                 picData.append("_id", random_id);
             }
             
-            await axios.post( SAPIBase + '/user/addSelllist', { _id : random_id, id, token });
-            
-            console.log("test");
             await axios.post( SAPIBase + '/feed/addFeed', postData);
             await axios.post( SAPIBase + '/feed/addPicture', picData, {});
             
+            await axios.post( SAPIBase + '/user/addSelllist', { _id : random_id, id, token });
+
             setTitle("");
             setContent("");
             setTime("0");

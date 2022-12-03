@@ -9,6 +9,14 @@ const OSchemaDefinition = {
     },
     InitialValue: String,
     CurrentValue: String,
+    seller: {
+        type: String,
+        default: ""
+    },
+    master: {
+        type: String,
+        default: ""
+    },
     diff: String
 };
 const OSchemaOptions = { timestamps: true };

@@ -71,7 +71,8 @@ const HomePage = (props: {}) => {
 		<div className="home">
 			<Header/>
 			<div className={"moveToUpload btnFade btnWhite"} onClick={() => navigate('/upload')}>Upload my things!</div>
-			<input type={"text"} className="textSearch-button" onChange={(e)=>{setSSearchItem(e.target.value)}} />
+			<span className="search-text">Search</span><input type={"text"} className="textSearch-button" onChange={(e)=>{setSSearchItem(e.target.value)}} />
+			<div className="home-items">
 			{ AuctionItems.map((val, i) => {
 				const DataDate = new Date(val.createdAt);
 				DataDate.setDate(DataDate.getDate() + Number(val.diff));
@@ -91,6 +92,7 @@ const HomePage = (props: {}) => {
 				</div>
 				);
 			})}
+			</div>
 
 		</div>
 	)

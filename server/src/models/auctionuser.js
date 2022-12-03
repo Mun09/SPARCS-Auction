@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const FKHelper = require("./helpers/foreign-key-helper");
 
 const OSchemaDefinition = {
     _id: String,
@@ -7,10 +8,11 @@ const OSchemaDefinition = {
     buylist: [String],
     selllist: [String]
 };
+
 const OSchemaOptions = { timestamps: true };
 
 const schema = new mongoose.Schema(OSchemaDefinition, OSchemaOptions);
 
-const FeedModel = mongoose.model("auctionuser", schema);
+const AuctionUserModel = mongoose.model("auctionuser", schema);
 
-module.exports = FeedModel;
+module.exports = AuctionUserModel;

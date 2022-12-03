@@ -5,7 +5,13 @@ let getRandomInt = require('../tools/getRandom.js');
 let secret_key = process.env.SECRET_KEY;
 
 const UserModel = require('../models/auctionuser');
+const FeedModel = require('../models/feed');
 const authUserMiddleware = require('../middleware/auth.js');
+
+const asyncFilter = async (arr, predicate) => {
+	const results = await Promise.all(arr.map(predicate));
+	return arr.filter((_v, index) => results[index]);
+};
 
 class UserDB {
     static _inst_;
@@ -20,10 +26,28 @@ class UserDB {
         try {
             const { username, password } = item;
             const findArguments = password != null ? {name: username, password} : {name: username};
-            const data = await UserModel.findOne(findArguments);
+            var data = await UserModel.findOne(findArguments);
             if(data == null) {
                 return {success: false}
             }
+
+            const valid_buylist = await asyncFilter(data.buylist, async (v) => {
+                var result = await FeedModel.findOne({_id: v});
+                if(result != null){
+                    return true;
+                }
+                return false;
+            });
+
+            const valid_selllist = await asyncFilter(data.selllist, async (v) => {
+                var result = await FeedModel.findOne({_id: v});
+                if(result != null){
+                    return true;
+                }
+                return false;
+            });
+
+            data = await UserModel.findOneAndUpdate(findArguments, {$set: {buylist: valid_buylist, selllist: valid_selllist}}, {new: true});
             return {success: true, data: data};
         } catch (e) {
             return {success: false, data: e};
@@ -45,8 +69,9 @@ class UserDB {
 
     addUserSelllist = async ( item ) => {
         try {
-            const { username, password, sellid } = item;
+            const { userid, username, password, sellid } = item;
             await UserModel.updateOne({ name : username, password }, { $push : { selllist : sellid} });
+            await FeedModel.updateOne({ _id: sellid }, { $set : {seller: userid}});
             return {success : true};
         } catch (e) {
 			console.log(`[AuctionUser-DB] Selllist Error: ${ e }`);
@@ -56,8 +81,10 @@ class UserDB {
 
     addUserBuylist = async ( item ) => {
         try {
-            const { username, password, buyid } = item;
-            await UserModel.updateOne({ name : username, password }, { $push : { buylist : buyid} });
+            const { userid, username, password, buyid } = item;
+            await UserModel.updateOne({ name : username, password }, { $addToSet : { buylist : buyid} });
+            console.log(buyid, " ", userid);
+            await FeedModel.updateOne({ _id: buyid }, { $set : { master: userid }});
             return {success : true};
         } catch (e) {
 			console.log(`[AuctionUser-DB] Selllist Error: ${ e }`);
@@ -132,8 +159,7 @@ router.post('/addSelllist', authUserMiddleware, async (req, res) => {
         const {_id, id, token} = req.body;
         const password = jwt.decode(token, secret_key);
         const UserInfo = await userDBInst.getUserInfo({username: id, password});
-        console.log(UserInfo);
-        const result = await userDBInst.addUserSelllist({username: UserInfo.data.name, password: UserInfo.data.password, sellid : _id});
+        const result = await userDBInst.addUserSelllist({userid: UserInfo.data._id, username: UserInfo.data.name, password: UserInfo.data.password, sellid : _id});
         return res.status(200).json({isOK: true});;
     } catch (e) {
         return res.status(500).json({error: e});
@@ -145,8 +171,7 @@ router.post('/addBuylist', authUserMiddleware, async (req, res) => {
         const {_id, id, token} = req.body;
         const password = jwt.decode(token, secret_key);
         const UserInfo = await userDBInst.getUserInfo({username : id, password});
-        console.log(UserInfo);
-        const result = await userDBInst.addUserBuylist({username: UserInfo.data.name, password: UserInfo.data.password, buyid : _id});
+        const result = await userDBInst.addUserBuylist({userid: UserInfo.data._id , username: UserInfo.data.name, password: UserInfo.data.password, buyid : _id});
         return res.status(200).json({isOK: true});;
     } catch (e) {
         return res.status(500).json({error: e});

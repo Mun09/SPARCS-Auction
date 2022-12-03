@@ -45,14 +45,15 @@ const MyPage = () => {
             Your Buy List: 
             {UserData.buylist.map((val, i) => {
                 return <div key={i}>
-                    {val}
+                    <div onClick={() => {navigate(`/goods?id=${val}`)}}
+                        style={{color: "red"}}>{val}</div>
                 </div>
             })}
             <br/>
             Your Sell List:
             {UserData.selllist.map((val, i) => {
                 return <div key={i}>
-                    {val}
+                    <div onClick={() => {navigate(`/goods?id=${val}`)}}>{val}</div>
                 </div>
             })}
 

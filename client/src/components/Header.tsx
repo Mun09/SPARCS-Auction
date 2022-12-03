@@ -26,7 +26,7 @@ const Header = () => {
 				<div onClick={() => navigate('/')}>Sparcs Auction</div>
 				{
 					LoginState ?
-					<div onClick={() => navigate('/mypage')}>MyPage</div> :
+					<div className={"mypage-icon"} onClick={() => navigate('/mypage')}>🏠 MyPage</div> :
 					<div onClick={() => navigate('/login')}>Login</div>
 				}
 			</div>

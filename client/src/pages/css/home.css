@@ -26,10 +26,12 @@ img {
 }
 
 .moveToUpload {
+    text-align: center;
     border: 2px black solid;
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: relative;
-    width: 120px;
     padding: 0;
     margin: 10px 20px 10px 10px;
     font-weight: 600;
@@ -51,4 +53,14 @@ img {
 
 .btnFade.btnWhite:hover {
     background: #fff;
+}
+
+.search-text {
+    
+    padding: 0 0 0 10px;
+}
+
+.home-items {
+    display: flex;
+    flex-wrap: wrap;
 }
